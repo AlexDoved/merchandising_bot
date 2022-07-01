@@ -84,7 +84,7 @@ async def outlet_load_name(message: types.Message, state: FSMContext):
         admin_message = message.text.upper()
         async with state.proxy() as data:
             if admin_message not in store_names:
-                await message.reply('Enter the correct namе!',
+                await message.reply('Enter the correct name!',
                                     reply_markup=await keyboard_for_admins(
                                         'admin_help_name_outlet'))
             else:
