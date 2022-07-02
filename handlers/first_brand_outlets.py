@@ -19,7 +19,7 @@ async def first_brand_omsk_get(callback: types.CallbackQuery):
 
 async def first_brand_exit_callback(callback: types.CallbackQuery):
     """Нажатие инлайн-кнопки <Назад> в списке магазинов первого бренда."""
-    text = 'В каком магазине будем смотреть оформление?'
+    text = 'In which store will we look at the design?'
     await bot.edit_message_text(text, chat_id=callback.message.chat.id,
                                 message_id=callback.message.message_id,
                                 reply_markup=await keyboard_for_users(
