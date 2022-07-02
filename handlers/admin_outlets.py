@@ -7,7 +7,7 @@ from init_bot import bot
 from data_base import sqlite_db
 from inline_keyboards.buttons_for_admins import keyboard_for_admins
 from inline_keyboards.buttons_for_users import keyboard_for_users
-from keyboards import kb_cancel
+from keyboards import kb_cancel_outlet
 
 ID = None
 store_names = ('MOSCOW', 'OMSK', 'SAMARA', 'DAGESTAN')
@@ -49,9 +49,9 @@ async def add_outlet_callback(callback: types.CallbackQuery):
     if callback.from_user.id == ID:
         await RetailOutletAdmin.photo.set()
         await bot.answer_callback_query(callback.id)
-        await bot.send_message(callback.from_user.id,
-                               text='Upload a <strong>photo</strong> 👉📎',
-                               reply_markup=kb_cancel, parse_mode='HTML')
+        await callback.message.reply('Upload the <strong>photo</strong> 👉📎',
+                                     reply_markup=kb_cancel_outlet,
+                                     parse_mode='HTML')
 
 
 async def outlet_cancel_handler(message: types.Message, state: FSMContext):
@@ -61,8 +61,7 @@ async def outlet_cancel_handler(message: types.Message, state: FSMContext):
         if current_state is None:
             return
         await state.finish()
-        await message.answer('<strong>The upload to the '
-                             'database was canceled! 👌</strong>',
+        await message.answer('<strong>Adding a point of sale is canceled! 👌</strong>',
                              reply_markup=types.ReplyKeyboardRemove(),
                              parse_mode='HTML')
     await message.delete()
@@ -178,15 +177,16 @@ def register_handlers_admin_outlets(dp: Dispatcher):
     """Регистрация хендлеров по работе с точками."""
     dp.register_message_handler(outlet_admin_command, commands=['edit_outlet'],
                                 is_chat_admin=True)
-    dp.register_message_handler(outlet_cancel_handler, state='*',
-                                commands='cancel')
     dp.register_callback_query_handler(add_outlet_callback,
                                        lambda x: x.data == 'load_outlet',
                                        state=None)
+    dp.register_message_handler(outlet_cancel_handler, state='*',
+                                commands='cancel-outlet')
     dp.register_message_handler(outlet_load_photo, content_types=['photo'],
                                 state=RetailOutletAdmin.photo)
     dp.register_message_handler(outlet_load_name, state=RetailOutletAdmin.name)
-    dp.register_message_handler(outlet_load_comment, state=RetailOutletAdmin.comment)
+    dp.register_message_handler(
+        outlet_load_comment, state=RetailOutletAdmin.comment)
     dp.register_callback_query_handler(open_main_outlets_func_callback,
                                        lambda x: x.data == 'main_func_outlet')
     dp.register_callback_query_handler(delete_outlet_callback,

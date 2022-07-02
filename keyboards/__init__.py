@@ -1,1 +1,1 @@
-from keyboards.admin_stop_load_kb import kb_cancel
+from keyboards.admin_stop_load_kb import kb_cancel_sample, kb_cancel_outlet

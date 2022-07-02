@@ -7,7 +7,7 @@ from init_bot import bot
 from data_base import sqlite_db
 from inline_keyboards.buttons_for_admins import keyboard_for_admins
 from inline_keyboards.buttons_for_users import keyboard_for_users
-from keyboards import kb_cancel
+from keyboards import kb_cancel_sample
 
 ID = None
 sample_names = ('BRAND 1', 'BRAND 2')
@@ -53,10 +53,10 @@ async def add_sample_callback(callback: types.CallbackQuery):
     if callback.from_user.id == ID:
         await DocumentPDF.document.set()
         await bot.answer_callback_query(callback.id)
-        await callback.message.reply('Download the <strong>PDF '
-                                     'file</strong> 👉📎',
-                                     reply_markup=kb_cancel,
-                                     parse_mode='HTML')
+        await callback.message.reply(
+            'Upload the <strong>PDF file</strong> 👉📎',
+            reply_markup=kb_cancel_sample,
+            parse_mode='HTML')
 
 
 async def sample_cancel_handler(message: types.Message, state: FSMContext):
@@ -66,8 +66,7 @@ async def sample_cancel_handler(message: types.Message, state: FSMContext):
         if current_state is None:
             return
         await state.finish()
-        await message.answer('<strong>The upload to the '
-                             'database was canceled! 👌</strong>',
+        await message.answer('<strong>Adding a document is canceled! 👌</strong>',
                              reply_markup=types.ReplyKeyboardRemove(),
                              parse_mode='HTML')
     await message.delete()
@@ -211,11 +210,11 @@ def register_handlers_admin_samples(dp: Dispatcher):
     """Регистрация хендлеров по работе с документами."""
     dp.register_message_handler(sample_admin_command, commands=['edit_sample'],
                                 is_chat_admin=True)
-    dp.register_message_handler(sample_cancel_handler, state='*',
-                                commands='cancel')
     dp.register_callback_query_handler(add_sample_callback,
                                        lambda x: x.data == 'load_pdf',
                                        state=None)
+    dp.register_message_handler(sample_cancel_handler, state='*',
+                                commands='cancel-pdf')
     dp.register_message_handler(sample_load_document,
                                 content_types=['document'],
                                 state=DocumentPDF.document)
