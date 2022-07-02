@@ -165,7 +165,7 @@ async def delete_outlet_callback(callback: types.CallbackQuery):
                                            f'Remove {point[1]}',
                                            callback_data=f'delete {point[1]}')))
         await bot.send_message(callback.from_user.id,
-                               text="<strong>⬆ This is the last point of sale, "
+                               text="⬆ This is the last point of sale, "
                                     "unloaded from the database.\n"
                                     "Don't forget to clean "
                                     "your chat history manually 💨",
@@ -178,11 +178,11 @@ def register_handlers_admin_outlets(dp: Dispatcher):
     """Регистрация хендлеров по работе с точками."""
     dp.register_message_handler(outlet_admin_command, commands=['edit_outlet'],
                                 is_chat_admin=True)
+    dp.register_message_handler(outlet_cancel_handler, state='*',
+                                commands='cancel')
     dp.register_callback_query_handler(add_outlet_callback,
                                        lambda x: x.data == 'load_outlet',
                                        state=None)
-    dp.register_message_handler(outlet_cancel_handler, state='*',
-                                commands='cancel')
     dp.register_message_handler(outlet_load_photo, content_types=['photo'],
                                 state=RetailOutletAdmin.photo)
     dp.register_message_handler(outlet_load_name, state=RetailOutletAdmin.name)

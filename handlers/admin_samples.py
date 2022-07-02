@@ -184,20 +184,21 @@ async def delete_sample_callback_run(callback: types.CallbackQuery):
 
 async def delete_sample_callback(callback: types.CallbackQuery):
     """Получение админом объектов (документов) для удаления из БД."""
+    await bot.answer_callback_query(callback.id)
     if callback.from_user.id == ID:
         read_db = await sqlite_db.sql_read_db_samples()
-        for merch in read_db:
-            await bot.send_document(callback.from_user.id, merch[0],
-                                    caption=f'Name: {merch[1]}\n'
+        for sample in read_db:
+            await bot.send_document(callback.from_user.id, sample[0],
+                                    caption=f'Name: {sample[1]}\n'
                                             f'Relevance of '
-                                            f'the document: {merch[-1]}')
+                                            f'the document: {sample[-1]}')
             await bot.send_message(callback.from_user.id, text='🔺🔺🔺',
                                    reply_markup=InlineKeyboardMarkup().add(
                                        InlineKeyboardButton(
-                                           f'Удалить {merch[1]}',
-                                           callback_data=f'del {merch[1]}')))
+                                           f'Remove {sample[1]}',
+                                           callback_data=f'del {sample[1]}')))
         await bot.send_message(callback.from_user.id,
-                               text="<strong>⬆ This is the last document, "
+                               text="⬆ This is the last document, "
                                     "unloaded from the database.\n"
                                     "Don't forget to clean "
                                     "your chat history manually 💨",
@@ -210,11 +211,11 @@ def register_handlers_admin_samples(dp: Dispatcher):
     """Регистрация хендлеров по работе с документами."""
     dp.register_message_handler(sample_admin_command, commands=['edit_sample'],
                                 is_chat_admin=True)
+    dp.register_message_handler(sample_cancel_handler, state='*',
+                                commands='cancel')
     dp.register_callback_query_handler(add_sample_callback,
                                        lambda x: x.data == 'load_pdf',
                                        state=None)
-    dp.register_message_handler(sample_cancel_handler, state='*',
-                                commands='cancel')
     dp.register_message_handler(sample_load_document,
                                 content_types=['document'],
                                 state=DocumentPDF.document)
